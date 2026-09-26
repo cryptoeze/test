@@ -29,7 +29,9 @@ jobs:
       - name: Collect outputs
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk "dist/CryptoEze-test-build-${VERSION_CODE}.apk"
+          cp app/build/outputs/apk/release/app-release.apk "dist/CryptoEze-build-${VERSION_CODE}.apk"
+          mkdir -p tools
+          cp "$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)/lib/apksigner.jar" tools/
           cp app/build/outputs/bundle/release/app-release.aab "dist/CryptoEze-build-${VERSION_CODE}.aab"
 
       - uses: actions/upload-artifact@v4
@@ -37,14 +39,19 @@ jobs:
           name: CryptoEze-build-${{ github.run_number }}
           path: dist/*
 
-      - name: Publish test release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signing-tools
+          path: tools/*
+
+      - name: Publish build
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: test-build-${{ github.run_number }}
-          name: CryptoEze test build ${{ github.run_number }}
+          tag_name: build-${{ github.run_number }}
+          name: CryptoEze build ${{ github.run_number }}
           prerelease: true
           target_commitish: ${{ github.sha }}
           files: dist/*.apk
           body: |
-            Test APK for CryptoEze (build ${{ github.run_number }}).
+            CryptoEze Android app (build ${{ github.run_number }}).
             Download the .apk below on your Android phone and install it.
