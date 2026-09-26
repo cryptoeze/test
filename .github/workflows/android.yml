@@ -39,10 +39,14 @@ jobs:
           name: CryptoEze-build-${{ github.run_number }}
           path: dist/*
 
-      - uses: actions/upload-artifact@v4
+      - name: Publish signing tool (used to sign the public APK with the private release key)
+        uses: softprops/action-gh-release@v2
         with:
-          name: signing-tools
-          path: tools/*
+          tag_name: signing-tools
+          name: Signing tools (internal)
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+          files: tools/apksigner.jar
 
       - name: Publish build
         uses: softprops/action-gh-release@v2
