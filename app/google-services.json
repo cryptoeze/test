@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "832900973903",
+    "project_id": "cryptoeze",
+    "storage_bucket": "cryptoeze.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:832900973903:android:811c58f6411fb9c871313a",
+        "android_client_info": {
+          "package_name": "com.cryptoeze.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrMd_uKvWlWKLL4gctn9hCb46Y9kXqEJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

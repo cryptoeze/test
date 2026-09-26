@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="148dp" android:height="148dp" android:viewportWidth="148" android:viewportHeight="148">
+    <!-- soft halo -->
+    <path android:fillColor="@color/surface"
+        android:pathData="M74,4a70,70 0 1,1 0,140a70,70 0 1,1 0,-140z" />
+    <!-- wifi arcs -->
+    <path android:strokeColor="@color/brand_teal" android:strokeWidth="8" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:pathData="M36,62C57,43 91,43 112,62" />
+    <path android:strokeColor="@color/brand_teal" android:strokeWidth="8" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:strokeAlpha="0.75" android:pathData="M49,76C63,64 85,64 99,76" />
+    <path android:strokeColor="@color/brand_teal" android:strokeWidth="8" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:strokeAlpha="0.5" android:pathData="M62,90C69,85 79,85 86,90" />
+    <path android:fillColor="@color/brand_teal"
+        android:pathData="M74,98a7,7 0 1,1 0,14a7,7 0 1,1 0,-14z" />
+    <!-- gold slash -->
+    <path android:strokeColor="@color/surface" android:strokeWidth="14" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:pathData="M44,40L104,112" />
+    <path android:strokeColor="@color/brand_gold" android:strokeWidth="7" android:strokeLineCap="round"
+        android:fillColor="#00000000" android:pathData="M44,40L104,112" />
+</vector>
