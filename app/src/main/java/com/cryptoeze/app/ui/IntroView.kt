@@ -85,7 +85,7 @@ class IntroView @JvmOverloads constructor(
 
         val cx = width / 2f
         val cy = height / 2f
-        val settle = progress(elapsed, 120, 650)
+        val settle = progress(elapsed, 200, 900)
 
         val tile = splashTile + (finalTile - splashTile) * settle
         val textHeight = textPaint.textSize
@@ -97,7 +97,7 @@ class IntroView @JvmOverloads constructor(
         canvas.scale(zoom, zoom, cx, cy)
 
         // Dot "heartbeat" once the mark lands.
-        val pulseT = ((elapsed - 520).toFloat() / 420f).coerceIn(0f, 1f)
+        val pulseT = ((elapsed - 800).toFloat() / 520f).coerceIn(0f, 1f)
         val dotScale = 1f + 0.28f * kotlin.math.sin(pulseT * Math.PI).toFloat()
         tilePaint.alpha = alpha; ringPaint.alpha = alpha; dotPaint.alpha = alpha
         BrandMark.draw(canvas, cx, markCy, tile, tilePaint, ringPaint, dotPaint, dotScale)
@@ -108,7 +108,7 @@ class IntroView @JvmOverloads constructor(
         textPaint.getTextWidths(word, widths)
         var x = cx - (widths.sum() + tracking * (word.length - 1)) / 2f
         for (i in word.indices) {
-            val p = progress(elapsed, 420L + i * 45L, 520)
+            val p = progress(elapsed, 650L + i * 70L, 650)
             textPaint.color = if (i < 6) inkColor else tealColor
             textPaint.alpha = (255 * p * fade).toInt()
             canvas.drawText(word, i, i + 1, x, baseline + (1f - p) * 14f * density, textPaint)
@@ -117,7 +117,7 @@ class IntroView @JvmOverloads constructor(
         canvas.restore()
 
         // Loader appears only if loading takes longer than the reveal.
-        val spinnerIn = progress(elapsed, 1150, 400)
+        val spinnerIn = progress(elapsed, 1900, 400)
         if (spinnerIn > 0f) {
             spinner.draw(canvas, cx, baseline + 64f * density, 13f * density,
                 SystemClock.uptimeMillis(), spinnerIn * fade)
@@ -129,7 +129,7 @@ class IntroView @JvmOverloads constructor(
     private fun startExit() {
         exiting = true
         ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 420
+            duration = 520
             interpolator = PathInterpolator(0.4f, 0f, 0.2f, 1f)
             addUpdateListener {
                 exitProgress = it.animatedValue as Float
@@ -155,6 +155,6 @@ class IntroView @JvmOverloads constructor(
     }
 
     companion object {
-        private const val MIN_DURATION = 1350L
+        private const val MIN_DURATION = 2400L
     }
 }

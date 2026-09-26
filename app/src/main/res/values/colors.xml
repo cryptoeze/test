@@ -11,4 +11,5 @@
     <color name="pill_bg">#E6121820</color>
     <color name="pill_text">#FFFFFF</color>
     <color name="on_teal">#0B1116</color>
+    <color name="loader_card">#FFFFFF</color>
 </resources>

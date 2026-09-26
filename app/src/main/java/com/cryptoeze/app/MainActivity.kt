@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
     private lateinit var offline: View
     private lateinit var lockView: View
     private lateinit var exitPill: TextView
+    private lateinit var pageLoader: View
     private lateinit var retry: MaterialButton
     private lateinit var retrySpinner: BrandSpinner
     private lateinit var appLock: AppLock
@@ -151,6 +152,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
         offline = findViewById(R.id.offline)
         lockView = findViewById(R.id.lock)
         exitPill = findViewById(R.id.exitPill)
+        pageLoader = findViewById(R.id.pageLoader)
         retry = findViewById(R.id.retry)
         retrySpinner = findViewById(R.id.retrySpinner)
         appLock = AppLock(this)
@@ -324,6 +326,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
         override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
             mainFrameFailed = false
             progress.show()
+            scheduleLoader()
             if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
                 view.evaluateJavascript(PageScripts.DOCUMENT_START, null)
             }
@@ -332,6 +335,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
         override fun onPageFinished(view: WebView, url: String) {
             swipe.isRefreshing = false
             progress.hide()
+            hideLoader()
             if (mainFrameFailed) return
             if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
                 view.evaluateJavascript(PageScripts.DOCUMENT_START, null)
@@ -349,6 +353,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
             if (!request.isForMainFrame) return
             mainFrameFailed = true
             failedUrl = request.url.toString()
+            hideLoader()
             showOffline(networkProblem = !isOnline() || error.errorCode in NETWORK_ERRORS)
             revealApp()
         }
@@ -374,7 +379,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
 
         override fun onProgressChanged(view: WebView, newProgress: Int) {
             progress.setProgressCompat(newProgress, true)
-            if (newProgress >= 100) progress.hide()
+            if (newProgress >= 100) { progress.hide(); hideLoader() }
         }
 
         override fun onShowFileChooser(
@@ -438,6 +443,26 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
         val path = uri.path.orEmpty().lowercase().trimEnd('/')
         val publicPage = path.isEmpty() || PUBLIC_PATHS.any { path.startsWith(it) }
         appLock.signedIn = !publicPage
+    }
+
+    // Centre loader: only for slow pages, so quick navigations never flash it.
+    private val showLoader = Runnable {
+        if (!firstPageShown || swipe.isRefreshing || offline.visibility == View.VISIBLE) return@Runnable
+        pageLoader.visibility = View.VISIBLE
+        pageLoader.scaleX = 0.8f; pageLoader.scaleY = 0.8f
+        pageLoader.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(220L).start()
+    }
+
+    private fun scheduleLoader() {
+        pageLoader.removeCallbacks(showLoader)
+        pageLoader.postDelayed(showLoader, LOADER_DELAY_MS)
+    }
+
+    private fun hideLoader() {
+        pageLoader.removeCallbacks(showLoader)
+        if (pageLoader.visibility != View.VISIBLE) return
+        pageLoader.animate().alpha(0f).scaleX(0.8f).scaleY(0.8f).setDuration(180L)
+            .withEndAction { pageLoader.visibility = View.GONE }.start()
     }
 
     private fun revealApp() {
@@ -791,6 +816,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
     companion object {
         private const val SITE_HOST = "cryptoeze.com"
         private const val EXIT_WINDOW_MS = 2000L
+        private const val LOADER_DELAY_MS = 600L
         private val PUBLIC_PATHS = listOf("/login", "/register", "/signup", "/sign-up", "/forgot", "/reset", "/verify", "/logout")
         private val NETWORK_ERRORS = setOf(
             WebViewClient.ERROR_HOST_LOOKUP, WebViewClient.ERROR_CONNECT,

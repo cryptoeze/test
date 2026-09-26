@@ -6,4 +6,5 @@
     <color name="text_secondary">#8C96A3</color>
     <color name="pill_bg">#F0EDF1F5</color>
     <color name="pill_text">#121820</color>
+    <color name="loader_card">#1E2731</color>
 </resources>

@@ -35,6 +35,22 @@
             app:trackThickness="3dp"
             app:trackCornerRadius="3dp" />
 
+        <FrameLayout
+            android:id="@+id/pageLoader"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:alpha="0"
+            android:background="@drawable/bg_loader_card"
+            android:elevation="10dp"
+            android:visibility="gone">
+
+            <com.cryptoeze.app.ui.BrandSpinner
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
         <include
             android:id="@+id/offline"
             layout="@layout/view_offline"
