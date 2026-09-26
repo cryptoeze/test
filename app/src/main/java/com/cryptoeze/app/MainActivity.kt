@@ -201,6 +201,16 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
         coldStart = false
     }
 
+    override fun onResume() {
+        super.onResume()
+        web.onResume()
+    }
+
+    override fun onPause() {
+        web.onPause()
+        super.onPause()
+    }
+
     override fun onStop() {
         super.onStop()
         appLock.onBackground()
@@ -418,13 +428,25 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
             // target="_blank" / window.open: capture the URL and route it like a normal link.
             val catcher = WebView(this@MainActivity)
             catcher.webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(v: WebView, request: WebResourceRequest): Boolean {
-                    val uri = request.url
+                private var handled = false
+
+                private fun route(v: WebView, uri: Uri) {
+                    if (handled) return
+                    handled = true
                     if (isInternal(uri)) web.loadUrl(uri.toString())
                     else if (uri.scheme == "http" || uri.scheme == "https") openCustomTab(uri)
                     else openExternalApp(uri)
-                    v.destroy()
+                    v.post { v.destroy() }
+                }
+
+                override fun shouldOverrideUrlLoading(v: WebView, request: WebResourceRequest): Boolean {
+                    route(v, request.url)
                     return true
+                }
+
+                // window.open() with a URL loads directly without asking shouldOverrideUrlLoading.
+                override fun onPageStarted(v: WebView, url: String, favicon: Bitmap?) {
+                    if (url != "about:blank") { v.stopLoading(); route(v, Uri.parse(url)) }
                 }
             }
             (resultMsg.obj as WebView.WebViewTransport).webView = catcher
@@ -725,10 +747,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
     private fun setupBackHandling() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (lockView.visibility != View.VISIBLE && offline.visibility != View.VISIBLE && web.canGoBack()) {
-                    web.goBack()
-                    return
-                }
+                // Like Binance / RedotPay: back never navigates pages, it asks to confirm exit.
                 val now = System.currentTimeMillis()
                 if (now - lastBackPress < EXIT_WINDOW_MS) {
                     finish()
