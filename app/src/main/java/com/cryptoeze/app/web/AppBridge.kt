@@ -43,6 +43,6 @@ class AppBridge(private val host: Host) {
     fun setInnerScrolled(scrolled: Boolean) = host.setInnerScrolled(scrolled)
 
     companion object {
-        const val NAME = "CryptoEzeApp"
+        val NAME = BuildConfig.UA_TOKEN
     }
 }

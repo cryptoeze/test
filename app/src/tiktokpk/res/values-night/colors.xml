@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_bg">#0B1220</color>
+    <color name="surface">#16203A</color>
+    <color name="loader_card">#18233C</color>
+</resources>

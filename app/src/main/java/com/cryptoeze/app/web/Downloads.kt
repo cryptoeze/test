@@ -70,7 +70,7 @@ object Downloads {
         val clean = suggested.replace(Regex("[\\\\/:*?\"<>|]"), "_").trim()
         if (clean.contains('.')) return clean
         val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime) ?: "bin"
-        val base = clean.ifEmpty { "CryptoEze_${System.currentTimeMillis()}" }
+        val base = clean.ifEmpty { "Download_${System.currentTimeMillis()}" }
         return "$base.$ext"
     }
 }

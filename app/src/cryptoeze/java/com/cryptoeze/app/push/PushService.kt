@@ -20,7 +20,7 @@ import com.google.firebase.messaging.RemoteMessage
 class PushService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
-        saveToken(this, token)
+        PushStore.saveToken(this, token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -31,16 +31,7 @@ class PushService : FirebaseMessagingService() {
     }
 
     companion object {
-        private const val PREFS = "push"
-        private const val KEY_TOKEN = "fcm_token"
-        const val EXTRA_URL = "url"
-
-        fun saveToken(context: Context, token: String) {
-            context.getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_TOKEN, token).apply()
-        }
-
-        fun token(context: Context): String =
-            context.getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY_TOKEN, "").orEmpty()
+        const val EXTRA_URL = PushStore.EXTRA_URL
 
         fun show(context: Context, title: String, body: String, url: String?) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)

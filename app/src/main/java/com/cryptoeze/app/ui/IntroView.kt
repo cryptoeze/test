@@ -34,7 +34,11 @@ class IntroView @JvmOverloads constructor(
     private val tealColor = ContextCompat.getColor(context, R.color.brand_teal)
     private val spinner = BrandSpinner.Painter(context)
 
-    private val word = "CRYPTOEZE"
+    private val word = context.getString(R.string.intro_wordmark)
+    private val accentFrom = resources.getInteger(R.integer.intro_accent_from)
+    // CryptoEze draws its mark in code (gold dot heartbeat); other brands draw their splash vector.
+    private val codeMark = resources.getBoolean(R.bool.intro_code_mark)
+    private val markDrawable = if (codeMark) null else ContextCompat.getDrawable(context, R.drawable.ic_splash)
     private val tracking = 3.2f * density
     private val emphasized = PathInterpolator(0.2f, 0f, 0f, 1f)
 
@@ -100,7 +104,16 @@ class IntroView @JvmOverloads constructor(
         val pulseT = ((elapsed - 800).toFloat() / 520f).coerceIn(0f, 1f)
         val dotScale = 1f + 0.28f * kotlin.math.sin(pulseT * Math.PI).toFloat()
         tilePaint.alpha = alpha; ringPaint.alpha = alpha; dotPaint.alpha = alpha
-        BrandMark.draw(canvas, cx, markCy, tile, tilePaint, ringPaint, dotPaint, dotScale)
+        val drawable = markDrawable
+        if (drawable == null) {
+            BrandMark.draw(canvas, cx, markCy, tile, tilePaint, ringPaint, dotPaint, dotScale)
+        } else {
+            // The splash vector is a 108-unit canvas shown at 288dp; its mark spans [tile].
+            val half = tile * (288f / 152f) / 2f * (1f + (dotScale - 1f) * 0.22f)
+            drawable.setBounds((cx - half).toInt(), (markCy - half).toInt(), (cx + half).toInt(), (markCy + half).toInt())
+            drawable.alpha = alpha
+            drawable.draw(canvas)
+        }
 
         // Wordmark, letter by letter.
         val baseline = markCy + finalTile / 2f + 30f * density + textHeight * 0.72f
@@ -109,7 +122,7 @@ class IntroView @JvmOverloads constructor(
         var x = cx - (widths.sum() + tracking * (word.length - 1)) / 2f
         for (i in word.indices) {
             val p = progress(elapsed, 650L + i * 70L, 650)
-            textPaint.color = if (i < 6) inkColor else tealColor
+            textPaint.color = if (i < accentFrom) inkColor else tealColor
             textPaint.alpha = (255 * p * fade).toInt()
             canvas.drawText(word, i, i + 1, x, baseline + (1f - p) * 14f * density, textPaint)
             x += widths[i] + tracking

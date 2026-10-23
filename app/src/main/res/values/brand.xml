@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intro_wordmark" translatable="false">CRYPTOEZE</string>
+    <integer name="intro_accent_from">6</integer>
+    <bool name="intro_code_mark">true</bool>
+</resources>

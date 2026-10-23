@@ -29,7 +29,10 @@ jobs:
       - name: Collect outputs
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk "dist/CryptoEze-build-${VERSION_CODE}.apk"
+          cp app/build/outputs/apk/cryptoeze/release/*.apk "dist/CryptoEze-build-${VERSION_CODE}.apk"
+          cp app/build/outputs/bundle/cryptoezeRelease/*.aab "dist/CryptoEze-build-${VERSION_CODE}.aab"
+          cp app/build/outputs/apk/tiktokpk/release/*.apk "dist/TikTokpk-build-${VERSION_CODE}.apk"
+          cp app/build/outputs/bundle/tiktokpkRelease/*.aab "dist/TikTokpk-build-${VERSION_CODE}.aab"
           mkdir -p tools
           cp "$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)/lib/apksigner.jar" tools/
           cp app/build/outputs/bundle/release/app-release.aab "dist/CryptoEze-build-${VERSION_CODE}.aab"
@@ -52,10 +55,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: CryptoEze build ${{ github.run_number }}
+          name: Apps build ${{ github.run_number }}
           prerelease: true
           target_commitish: ${{ github.sha }}
           files: dist/*.apk
           body: |
-            CryptoEze Android app (build ${{ github.run_number }}).
+            CryptoEze and TikTokpk Android apps (build ${{ github.run_number }}).
             Download the .apk below on your Android phone and install it.

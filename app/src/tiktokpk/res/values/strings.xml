@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TikTokpk</string>
+    <string name="home_url" translatable="false">https://tiktokpk.xyz/</string>
+    <string name="locked_title">TikTokpk is locked</string>
+    <string name="unlock_prompt_title">Unlock TikTokpk</string>
+    <string name="page_error_body">We couldn\'t reach TikTokpk right now.\nPlease try again in a moment.</string>
+</resources>

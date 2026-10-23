@@ -26,6 +26,28 @@ android {
         versionName = "1.0.2"
     }
 
+    flavorDimensions += "brand"
+    productFlavors {
+        create("cryptoeze") {
+            dimension = "brand"
+            applicationId = "com.cryptoeze.app"
+            versionName = "1.0.2"
+            manifestPlaceholders["siteHost"] = "cryptoeze.com"
+            buildConfigField("String", "SITE_HOST", "\"cryptoeze.com\"")
+            buildConfigField("String", "UA_TOKEN", "\"CryptoEzeApp\"")
+            buildConfigField("boolean", "PUSH_ENABLED", "true")
+        }
+        create("tiktokpk") {
+            dimension = "brand"
+            applicationId = "com.tiktokpk.app"
+            versionName = "1.0.0"
+            manifestPlaceholders["siteHost"] = "tiktokpk.xyz"
+            buildConfigField("String", "SITE_HOST", "\"tiktokpk.xyz\"")
+            buildConfigField("String", "UA_TOKEN", "\"TikTokpkApp\"")
+            buildConfigField("boolean", "PUSH_ENABLED", "false")
+        }
+    }
+
     signingConfigs {
         // Test key: only for APKs shared for testing, so each new build installs over the last.
         create("test") {
@@ -68,6 +90,11 @@ android {
     }
 }
 
+// Only the CryptoEze brand uses Firebase; other brands have no google-services.json.
+googleServices {
+    missingGoogleServicesStrategy = com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy.IGNORE
+}
+
 dependencies {
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
@@ -80,6 +107,6 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.android.play:app-update-ktx:2.1.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
-    implementation("com.google.firebase:firebase-messaging")
+    "cryptoezeImplementation"(platform("com.google.firebase:firebase-bom:33.16.0"))
+    "cryptoezeImplementation"("com.google.firebase:firebase-messaging")
 }

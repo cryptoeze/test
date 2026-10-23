@@ -47,7 +47,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
-import com.cryptoeze.app.push.PushService
+import com.cryptoeze.app.push.PushStore
 import com.cryptoeze.app.security.AppLock
 import com.cryptoeze.app.ui.BrandSpinner
 import com.cryptoeze.app.ui.IntroView
@@ -228,7 +228,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
     }
 
     private fun urlFromIntent(intent: Intent?): String? {
-        val url = intent?.getStringExtra(PushService.EXTRA_URL) ?: intent?.data?.toString() ?: return null
+        val url = intent?.getStringExtra(PushStore.EXTRA_URL) ?: intent?.data?.toString() ?: return null
         return url.takeIf { isInternal(Uri.parse(it)) }
     }
 
@@ -292,7 +292,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
             allowFileAccess = false
             allowContentAccess = true
             mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-            userAgentString = "$userAgentString CryptoEzeApp/${BuildConfig.VERSION_NAME}"
+            userAgentString = "$userAgentString ${BuildConfig.UA_TOKEN}/${BuildConfig.VERSION_NAME}"
         }
         if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             WebSettingsCompat.setAlgorithmicDarkeningAllowed(web.settings, false)
@@ -307,7 +307,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
         web.addJavascriptInterface(AppBridge(this), AppBridge.NAME)
 
         if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            WebViewCompat.addDocumentStartJavaScript(web, PageScripts.DOCUMENT_START, setOf("https://*.cryptoeze.com", "https://cryptoeze.com"))
+            WebViewCompat.addDocumentStartJavaScript(web, PageScripts.DOCUMENT_START, setOf("https://*.$SITE_HOST", "https://$SITE_HOST"))
         }
 
         web.webViewClient = Client()
@@ -353,7 +353,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
             hideOffline()
             readPageColor()
             trackSession(Uri.parse(url))
-            PushService.token(this@MainActivity).takeIf { it.isNotEmpty() }?.let {
+            PushStore.token(this@MainActivity).takeIf { it.isNotEmpty() }?.let {
                 view.evaluateJavascript(PageScripts.fcmTokenEvent(it), null)
             }
             revealApp()
@@ -570,7 +570,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
 
     private fun copy(text: String, confirmation: String) {
         val clipboard = getSystemService(ClipboardManager::class.java)
-        clipboard.setPrimaryClip(ClipData.newPlainText("CryptoEze", text))
+        clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), text))
         // Android 13+ shows its own copy confirmation.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) showPill(confirmation)
     }
@@ -644,7 +644,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
 
     // ---- AppBridge.Host ------------------------------------------------------------------------
 
-    override fun fcmToken(): String = PushService.token(this)
+    override fun fcmToken(): String = PushStore.token(this)
 
     override fun copyText(text: String) {
         runOnUiThread { copy(text, getString(R.string.copied)) }
@@ -796,7 +796,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
     // ---- Notifications & updates -------------------------------------------------------------
 
     private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        if (!BuildConfig.PUSH_ENABLED || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
         if (hasPermission(Manifest.permission.POST_NOTIFICATIONS)) return
         val prefs = getSharedPreferences("app", MODE_PRIVATE)
         if (prefs.getBoolean("asked_notifications", false)) return
@@ -833,7 +833,7 @@ class MainActivity : AppCompatActivity(), AppBridge.Host {
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
     companion object {
-        private const val SITE_HOST = "cryptoeze.com"
+        private const val SITE_HOST = BuildConfig.SITE_HOST
         private const val EXIT_WINDOW_MS = 2000L
         private const val LOADER_DELAY_MS = 600L
         private val PUBLIC_PATHS = listOf("/login", "/register", "/signup", "/sign-up", "/forgot", "/reset", "/verify", "/logout")
