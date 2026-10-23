@@ -29,10 +29,12 @@ jobs:
       - name: Collect outputs
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/cryptoeze/release/*.apk "dist/CryptoEze-build-${VERSION_CODE}.apk"
-          cp app/build/outputs/bundle/cryptoezeRelease/*.aab "dist/CryptoEze-build-${VERSION_CODE}.aab"
-          cp app/build/outputs/apk/tiktokpk/release/*.apk "dist/TikTokpk-build-${VERSION_CODE}.apk"
-          cp app/build/outputs/bundle/tiktokpkRelease/*.aab "dist/TikTokpk-build-${VERSION_CODE}.aab"
+          find app/build/outputs -name "*.apk" -o -name "*.aab"
+          for brand in cryptoeze:CryptoEze tiktokpk:TikTokpk; do
+            flavor=${brand%%:*}; name=${brand##*:}
+            cp "$(find app/build/outputs/apk -path "*${flavor}*" -name "*.apk" | head -1)" "dist/${name}-build-${VERSION_CODE}.apk"
+            cp "$(find app/build/outputs/bundle -path "*${flavor}*" -name "*.aab" | head -1)" "dist/${name}-build-${VERSION_CODE}.aab"
+          done
           mkdir -p tools
           cp "$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)/lib/apksigner.jar" tools/
           cp app/build/outputs/bundle/release/app-release.aab "dist/CryptoEze-build-${VERSION_CODE}.aab"
