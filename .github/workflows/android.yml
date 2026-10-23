@@ -29,6 +29,8 @@ jobs:
       - name: Collect outputs
         run: |
           set -x
+          trap 'echo "::error::Collect failed at line $LINENO: $BASH_COMMAND"' ERR
+          echo "::warning::outputs: $(find app/build/outputs -type f \( -name '*.apk' -o -name '*.aab' \) | tr '\n' ' ')"
           mkdir -p dist
           find app/build/outputs -name "*.apk" -o -name "*.aab"
           for brand in cryptoeze:CryptoEze tiktokpk:TikTokpk; do
