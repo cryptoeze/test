@@ -41,7 +41,6 @@ jobs:
           mkdir -p tools
           signer=$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}" -name apksigner.jar 2>/dev/null | sort -V | tail -1)
           if [ -n "$signer" ]; then cp "$signer" tools/; else echo "apksigner.jar not found"; fi
-          cp app/build/outputs/bundle/release/app-release.aab "dist/CryptoEze-build-${VERSION_CODE}.aab"
 
       - uses: actions/upload-artifact@v4
         with:
