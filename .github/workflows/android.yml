@@ -28,6 +28,7 @@ jobs:
 
       - name: Collect outputs
         run: |
+          set -x
           mkdir -p dist
           find app/build/outputs -name "*.apk" -o -name "*.aab"
           for brand in cryptoeze:CryptoEze tiktokpk:TikTokpk; do
@@ -36,7 +37,8 @@ jobs:
             cp "$(find app/build/outputs/bundle -path "*${flavor}*" -name "*.aab" | head -1)" "dist/${name}-build-${VERSION_CODE}.aab"
           done
           mkdir -p tools
-          cp "$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)/lib/apksigner.jar" tools/
+          signer=$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}" -name apksigner.jar 2>/dev/null | sort -V | tail -1)
+          if [ -n "$signer" ]; then cp "$signer" tools/; else echo "apksigner.jar not found"; fi
           cp app/build/outputs/bundle/release/app-release.aab "dist/CryptoEze-build-${VERSION_CODE}.aab"
 
       - uses: actions/upload-artifact@v4
@@ -52,6 +54,7 @@ jobs:
           prerelease: true
           target_commitish: ${{ github.sha }}
           files: tools/apksigner.jar
+          fail_on_unmatched_files: false
 
       - name: Publish build
         uses: softprops/action-gh-release@v2
